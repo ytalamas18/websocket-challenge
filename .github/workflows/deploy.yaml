@@ -1,0 +1,61 @@
+name: CI/CD WebSocket Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: ytalamas/websocket-challenge
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest 
+    
+    steps:
+    # Step 1: Clone the repository source code
+    - name: Checkout Source Code
+      uses: actions/checkout@v4
+
+    # Step 2: Set up Docker Buildx (Advanced building engine)
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    # Step 3: Authenticate into Docker Hub using GitHub Secrets
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    # Step 4: Build and Push the image to Docker Hub (Real action)
+    - name: Build and Push Docker Image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+    # Step 5: Install and configure kubectl (Kubernetes CLI)
+    - name: Set up Kubeconfig
+      uses: azure/k8s-set-context@v3
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBECONFIG }}
+
+    # Step 6: Deploy to the actual Kubernetes Cluster
+    - name: Deploy to Kubernetes
+      run: |
+        echo "Applying all manifests from the /k8s folder..."
+        kubectl apply -f k8s/
+        
+        echo "Updating deployment image to match the new version..."
+        kubectl set image deployment/websocket-server websocket-server=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+    # Step 7: Real Post-Deployment Validation
+    - name: Verify Rollout Status
+      run: |
+        echo "Waiting for the 3 replicas to be fully ready and healthy..."
+        kubectl rollout status deployment/websocket-server --timeout=90s

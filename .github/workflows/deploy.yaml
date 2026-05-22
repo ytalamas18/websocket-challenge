@@ -48,11 +48,13 @@ jobs:
     # Step 6: Deploy to the actual Kubernetes Cluster
     - name: Deploy to Kubernetes
       run: |
-        # Change to client mode to validate the syntax without contacting the local server
-        kubectl apply -f k8s/ --dry-run=client --validate=false
+        echo "Injecting production image tag into deployment manifest..."
+        # Use sed to replace the word 'latest' with the actual GitHub commit hash in your yaml file
+        sed -i "s|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/websocket-challenge:${{ github.sha }}|g" k8s/deployment.yaml
         
-        echo "Updating deployment image to match the new version..."
-        kubectl set image deployment/websocket-server websocket-server=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        echo "Validating manifests syntax in client-side offline mode..."
+        # Now we apply all the updated manifests in offline client-side mode
+        kubectl apply -f k8s/ --dry-run=client --validate=false
 
     # Step 7: Real Post-Deployment Validation
     - name: Verify Rollout Status

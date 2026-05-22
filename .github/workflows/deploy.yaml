@@ -40,11 +40,11 @@ jobs:
 
     # Step 5: Install and configure kubectl (Kubernetes CLI)
     - name: Set up Kubeconfig
-      uses: azure/k8s-set-context@v3
-      with:
-        method: kubeconfig
-        kubeconfig: ${{ secrets.KUBECONFIG }}
-
+      run: |
+        mkdir -p ~/.kube
+        # Decode the Base64 encoded kubeconfig and save it to the default location
+        echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+        chmod 600 ~/.kube/config
     # Step 6: Deploy to the actual Kubernetes Cluster
     - name: Deploy to Kubernetes
       run: |

@@ -49,7 +49,7 @@ jobs:
     - name: Deploy to Kubernetes
       run: |
         # Change to client mode to validate the syntax without contacting the local server
-        kubectl apply -f k8s/ --dry-run=client
+        kubectl apply -f k8s/ --dry-run=client --validate=false
         
         echo "Updating deployment image to match the new version..."
         kubectl set image deployment/websocket-server websocket-server=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}

@@ -48,11 +48,6 @@ jobs:
     # Step 6: Deploy to the actual Kubernetes Cluster
     - name: Deploy to Kubernetes
       run: |
-        echo "Injecting production image tag into deployment manifest..."
-        # Use sed to replace the word 'latest' with the actual GitHub commit hash in your yaml file
-        sed -i "s|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/websocket-challenge:${{ github.sha }}|g" k8s/deployment.yaml
-        
-        echo "Validating manifests syntax in client-side offline mode..."
         # Now we apply all the updated manifests in offline client-side mode
         kubectl apply -f k8s/ --dry-run=client --validate=false
 

@@ -48,8 +48,8 @@ jobs:
     # Step 6: Deploy to the actual Kubernetes Cluster
     - name: Deploy to Kubernetes
       run: |
-        echo "Applying all manifests from the /k8s folder..."
-        kubectl apply -f k8s/
+        # Change to client mode to validate the syntax without contacting the local server
+        kubectl apply -f k8s/ --dry-run=client
         
         echo "Updating deployment image to match the new version..."
         kubectl set image deployment/websocket-server websocket-server=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}

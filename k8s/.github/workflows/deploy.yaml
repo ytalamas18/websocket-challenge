@@ -1,0 +1,46 @@
+name: CI/CD WebSocket Pipeline
+
+# Triggers: The pipeline activates on a git push to the main branches
+on:
+  push:
+    branches: [ main, master ]
+
+# Global Environment Variables for easier maintenance
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: tu-usuario-dockerhub/websocket-challenge
+
+jobs:
+  build-and-deploy:
+    # Runs on a clean, temporary Ubuntu Linux virtual machine provided by GitHub
+    runs-on: ubuntu-latest 
+    
+    steps:
+    # Step 1: Clone the repository's source code into the GitHub runner
+    - name: Checkout Source Code
+      uses: actions/checkout@v4
+
+    # Step 2: Set up Docker Buildx engine on the GitHub runner
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    # Step 3: Build the Docker image using the Git Commit SHA as a Tag
+    - name: Build Docker Image
+      run: |
+        # Extract the first 7 characters of the Git commit SHA hash
+        COMMIT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+        
+        echo "Building image with tags: $COMMIT_SHA and latest"
+        
+        # Build and tag the image with both the unique SHA and 'latest'
+        docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$COMMIT_SHA -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest .
+
+    # Step 4: Simulate pushing the image to the Container Registry (Docker Hub)
+    - name: Push Docker Image (Simulation)
+      run: |
+        COMMIT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+        
+        echo "[SIMULATION] Logging into Container Registry: ${{ env.REGISTRY }}"
+        echo "[SIMULATION] Running: docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$COMMIT_SHA"
+        echo "[SIMULATION] Running: docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+        echo "Image successfully promoted to the registry!"

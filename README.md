@@ -123,6 +123,3 @@ Launch a separate terminal session and run the automated load injector to spin u
 PowerShell
 node test-connections.js
 You can monitor connection behaviors and traffic metrics instantly by browsing your local Prometheus targets or loading your live Canvas layout inside Grafana (http://localhost:3000).
-
-GRAFANA SCREENSHOTS
-<img width="1699" height="715" alt="image" src="https://github.com/user-attachments/assets/9472f954-427a-4a69-8db3-0be80292de35" />

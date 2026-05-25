@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: websocket-server-monitor
+  namespace: monitoring         
+  labels:
+    release: monit        
+spec:
+  selector:
+    matchLabels:
+      app: websocket-server    
+  namespaceSelector:
+    any: true                  
+  endpoints:
+    - port: http-ws           
+      path: /metrics            
+      interval: 15s

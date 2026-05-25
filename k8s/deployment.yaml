@@ -21,10 +21,10 @@ spec:
         app: websocket-server
     spec:
       terminationGracePeriodSeconds: 90
-
       containers:
         - name: websocket-server
           image: websocket-challenge:latest
+          imagePullPolicy: Never
           envFrom:
             - configMapRef:
                 name: websocket-config

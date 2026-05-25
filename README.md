@@ -2,7 +2,7 @@
 
 This repository contains the complete solution for deploying, automating, and monitoring a highly available WebSocket service within a Kubernetes cluster. The entire architecture is designed following production-grade standards for fault tolerance, immutability, and native cloud observability.
 
-## 🚀 System Architecture
+ 🚀 System Architecture
 
 The solution addresses classic WebSocket protocol challenges (long-lived, persistent connections) in distributed environments using the following edge network topology:
 
@@ -11,6 +11,9 @@ The solution addresses classic WebSocket protocol challenges (long-lived, persis
 3. **Deployment (3 Replicas):** Guarantees high availability and elastic scaling using controlled update strategies and infrastructure health probes.
 
 ---
+GRAFANA SCREENSHOT
+<img width="1699" height="715" alt="image" src="https://github.com/user-attachments/assets/45af611d-bf98-4217-8e62-0c3e2990d37f" />
+
 
 ## 📦 Project Structure
 

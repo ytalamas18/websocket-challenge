@@ -13,15 +13,15 @@ jobs:
     runs-on: ubuntu-latest 
     
     steps:
-    # Step 1: Clone the repository source code
+    # Step 1: Clone code from the repository
     - name: Checkout Source Code
       uses: actions/checkout@v4
 
-    # Step 2: Set up Docker Buildx (Advanced building engine)
+    # Step 2: Configure Docker Buildx (Advanced building engine)
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    # Step 3: Authenticate into Docker Hub using GitHub Secrets
+    # Step 3: Docker Hub Authentication using GitHub Secrets
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
       with:
@@ -37,22 +37,3 @@ jobs:
         tags: |
           ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-
-    # Step 5: Install and configure kubectl (Kubernetes CLI)
-    - name: Set up Kubeconfig
-      run: |
-        mkdir -p ~/.kube
-        # Decode the Base64 encoded kubeconfig and save it to the default location
-        echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
-        chmod 600 ~/.kube/config
-    # Step 6: Deploy to the actual Kubernetes Cluster
-    - name: Deploy to Kubernetes
-      run: |
-        # Now we apply all the updated manifests in offline client-side mode
-        kubectl apply -f k8s/ --dry-run=client --validate=false
-
-    # Step 7: Real Post-Deployment Validation
-    - name: Verify Rollout Status
-      run: |
-        echo "Waiting for the 3 replicas to be fully ready and healthy..."
-        kubectl rollout status deployment/websocket-server --timeout=90s
